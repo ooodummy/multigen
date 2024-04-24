@@ -1,0 +1,3 @@
+[submodule "lib/raw_pdb"]
+	path = lib/raw_pdb
+	url = https://github.com/MolecularMatters/raw_pdb.git
