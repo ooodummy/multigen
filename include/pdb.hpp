@@ -7,6 +7,8 @@ namespace multigen {
 
     // For auto downloading PDBs for Unity games
     // https://github.com/SamuelTulach/ida-unity-pdb-downloader/tree/main/UnityPdb/UnityPdb
+
+    // How can we merge generated classes with backends?
 }
 
 #endif

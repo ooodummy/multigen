@@ -1,28 +1,31 @@
 #include "multigen.hpp"
 
-int main() {
-    const auto memory = std::make_unique<multigen::win32_memory>();
+namespace multigen {
+    bool process_and_serialize(const std::shared_ptr<base_backend>& backend, const std::shared_ptr<base_processor>& processor, const std::shared_ptr<base_serializer>& serializer, const std::filesystem::path& output_directory) {
+        if (!processor || !serializer)
+            return false;
 
-    // What should be done automatically with static analysis and then what should be done using mono/il2cpp dissection?
-    // How should the backend be structured?
-    std::string target_process = "target_process";
+        const auto all_containers = backend->all_metadata_containers();
+        if (all_containers.empty()) {
+            printf("[!] No metadata containers found\n");
+            return false;
+        }
 
-    HWND hwnd = FindWindowA(nullptr, target_process.c_str());
-    if (hwnd == nullptr) {
-        MessageBoxA(nullptr, "Failed to find process!", "Error", MB_ICONERROR | MB_OK);
-        return 1;
+        if (!processor->initialize(all_containers)) {
+            printf("[!] Processor initialization failed\n");
+            return false;
+        }
+
+        if (!processor->serialize(serializer)) {
+            printf("[!] Processor serialization failed\n");
+            return false;
+        }
+
+        if (!processor->write(output_directory)) {
+            printf("[!] Processor write failed\n");
+            return false;
+        }
+
+        return true;
     }
-
-    DWORD pid;
-    if (!GetWindowThreadProcessId(hwnd, &pid)) {
-        MessageBoxA(nullptr, "Failed to get process id!", "Error", MB_ICONERROR | MB_OK);
-        return 1;
-    }
-
-    if (!memory->attach(pid)) {
-        MessageBoxA(nullptr, "Failed to attach to process!", "Error", MB_ICONERROR | MB_OK);
-        return 1;
-    }
-
-    return 0;
 }
